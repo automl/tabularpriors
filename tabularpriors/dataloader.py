@@ -106,7 +106,8 @@ class TabICLPriorDataLoader(DataLoader):
         num_steps (int): Number of batches to generate per epoch.
         batch_size (int): Number of functions per batch.
         num_datapoints_max (int): Maximum number of datapoints per function.
-        num_features (int): Maximum number of features in x.
+        min_features (int): Minimum number of features in x.
+        max_features (int): Maximum number of features in x.
         max_num_classes (int): Maximum number of classes (for classification tasks).
         device (torch.device): Target device for tensors.
     """
@@ -116,24 +117,24 @@ class TabICLPriorDataLoader(DataLoader):
         num_steps: int,
         batch_size: int,
         num_datapoints_max: int,
-        num_features: int,
+        min_features: int,
+        max_features: int,
         max_num_classes: int,
         device: torch.device,
-        min_features: int = 3,
     ):
         self.num_steps = num_steps
         self.batch_size = batch_size
         self.num_datapoints_max = num_datapoints_max
-        self.num_features = num_features
-        self.max_num_classes = max_num_classes
         self.min_features = min_features
+        self.max_features = max_features
+        self.max_num_classes = max_num_classes
         self.device = device
 
         self.pd = TabICLPriorDataset(
             batch_size=batch_size,
             batch_size_per_gp=batch_size,
             min_features=min_features,
-            max_features=num_features,
+            max_features=max_features,
             max_classes=max_num_classes,
             max_seq_len=num_datapoints_max,
         )

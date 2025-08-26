@@ -12,16 +12,13 @@ from tabularpriors.utils import build_ticl_prior, dump_prior_to_h5
 
 def main():
     parser = argparse.ArgumentParser(description="Dump TICL or TabICL prior into HDF5 format.")
-    parser.add_argument(
-        "--lib", type=str, required=True, choices=["ticl", "tabicl"], help="Which library to use for the prior."
-    )
+    parser.add_argument("--lib", type=str, required=True, choices=["ticl", "tabicl"], help="Which library to use for the prior.")
     parser.add_argument("--save_path", type=str, required=False, help="Path to save the HDF5 file.")
     parser.add_argument("--num_batches", type=int, default=100, help="Number of batches to dump.")
     parser.add_argument("--batch_size", type=int, default=8, help="Batch size for dumping.")
-    parser.add_argument(
-        "--device", type=str, default="cpu", choices=["cpu", "cuda"], help="Device to run prior sampling on."
-    )
+    parser.add_argument("--device", type=str, default="cpu", choices=["cpu", "cuda"], help="Device to run prior sampling on.")
     parser.add_argument("--prior_type", type=str, default="mlp", choices=["mlp", "gp"], help="Which TICL prior to use.")
+    parser.add_argument("--min_features", type=int, default=1, help="Minimum number of input features.")
     parser.add_argument("--max_features", type=int, default=100, help="Maximum number of input features.")
     parser.add_argument("--max_seq_len", type=int, default=1024, help="Maximum number of data points per function.")
     parser.add_argument("--min_eval_pos", type=int, default=10, help="Minimum evaluation position in the sequence.")
@@ -59,12 +56,11 @@ def main():
             num_steps=args.num_batches,
             batch_size=args.batch_size,
             num_datapoints_max=args.max_seq_len,
-            num_features=args.max_features,
+            min_features=args.min_features,
+            max_features=args.max_features,
             max_num_classes=args.max_classes,
             device=device,
         )
         problem_type = "classification"
 
-    dump_prior_to_h5(
-        prior, args.max_classes, args.batch_size, args.save_path, problem_type, args.max_seq_len, args.max_features
-    )
+    dump_prior_to_h5(prior, args.max_classes, args.batch_size, args.save_path, problem_type, args.max_seq_len, args.max_features)
