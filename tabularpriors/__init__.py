@@ -9,7 +9,7 @@ from .dataloader import (
 )
 from .utils import build_ticl_prior, dump_prior_to_h5
 
-__version__ = "0.1.0"
+__version__ = "0.0.1"
 __all__ = [
     "get_ticl_prior_config",
     "PriorDataLoader", 
