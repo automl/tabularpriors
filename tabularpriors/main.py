@@ -17,7 +17,8 @@ def main():
     parser.add_argument("--num_batches", type=int, default=100, help="Number of batches to dump.")
     parser.add_argument("--batch_size", type=int, default=8, help="Batch size for dumping.")
     parser.add_argument("--device", type=str, default="cpu", choices=["cpu", "cuda"], help="Device to run prior sampling on.")
-    parser.add_argument("--prior_type", type=str, default="mlp", choices=["mlp", "gp"], help="Which TICL prior to use.")
+    parser.add_argument("--prior_type", type=str, default="mlp", choices=["mlp", "gp", "classification_adapter", "boolean_conjunctions", "step_function"], help="Which TICL prior to use.")
+    parser.add_argument("--base_prior_type", type=str, default="mlp", choices=["mlp", "gp"], help="Base regression prior for classification_adapter.")
     parser.add_argument("--min_features", type=int, default=1, help="Minimum number of input features.")
     parser.add_argument("--max_features", type=int, default=100, help="Maximum number of input features.")
     parser.add_argument("--min_seq_len", type=int, default=None, help="Minimum number of data points per function.")
@@ -42,8 +43,11 @@ def main():
         args.save_path = f"prior_{args.lib}{prior_name}_{args.num_batches}x{args.batch_size}_{args.max_seq_len}x{args.max_features}.h5"
 
     if args.lib == "ticl":
+        # determine if this is a classification prior
+        is_classification_prior = args.prior_type in ["classification_adapter", "boolean_conjunctions", "step_function"]
+        
         prior = TICLPriorDataLoader(
-            prior=build_ticl_prior(args.prior_type),
+            prior=build_ticl_prior(args.prior_type, args.base_prior_type, args.max_classes),
             num_steps=args.num_batches,
             batch_size=args.batch_size,
             num_datapoints_max=args.max_seq_len,
@@ -51,7 +55,7 @@ def main():
             device=device,
             min_eval_pos=args.min_eval_pos,
         )
-        problem_type = "regression"
+        problem_type = "classification" if is_classification_prior else "regression"
     else:
         if args.min_seq_len == args.max_seq_len:
             args.min_seq_len = None  # TabICL prior requires min_seq_len < max_seq_len

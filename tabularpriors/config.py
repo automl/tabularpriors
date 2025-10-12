@@ -2,8 +2,8 @@
 
 import torch
 
-def get_ticl_prior_config(prior_type: str) -> dict:
-    """Return the default kwargs for MLPPrior or GPPrior."""
+def get_ticl_prior_config(prior_type: str, max_num_classes: int = None) -> dict:
+    """Return the default kwargs for MLPPrior, GPPrior, or classification priors."""
     
     if prior_type == "mlp":
         return {
@@ -32,6 +32,35 @@ def get_ticl_prior_config(prior_type: str) -> dict:
             "noise": 1e-3,
             "outputscale": 1.0,
             "lengthscale": 0.2,
+        }
+    elif prior_type == "classification_adapter":
+        return {
+            "max_num_classes": 50,  # this is a global upper bound for how many output classes the generator or model can handle;
+                                    # setting it > 0 keeps classification mode active (0 = regression),
+                                    # and actual tasks will use up to this many classes depending on num_classes and random sampling
+            "num_classes": max_num_classes,
+            "balanced": False,
+            "output_multiclass_ordered_p": 0.1,
+            "multiclass_type": "rank",
+            "categorical_feature_p": 0.15,
+            "nan_prob_no_reason": 0.05,
+            "nan_prob_a_reason": 0.03,
+            "set_value_to_nan": 0.9,     
+            "num_features_sampler": "uniform",
+            "pad_zeros": False,
+            "feature_curriculum": False,
+        }
+    elif prior_type == "boolean_conjunctions":
+        return {
+          'max_rank': 20,
+          'max_fraction_uninformative': 0.3,
+          'p_uninformative': 0.3,
+          'verbose': False
+        }
+    elif prior_type == "step_function":
+        return {
+            "max_steps": 1,
+            "sampling": "uniform",
         }
     else:
         raise ValueError(f"Unsupported TICL prior type: {prior_type}")
