@@ -1,3 +1,4 @@
+This repository is now part of https://github.com/automl/TFM-Playground, development will continue under [tfmplayground.priors](https://github.com/automl/TFM-Playground/tree/main/tfmplayground/priors).
 # tabularpriors
 
 A python module implementing interfaces for various public tabular priors.
